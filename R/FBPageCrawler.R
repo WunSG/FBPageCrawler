@@ -17,15 +17,14 @@ FBPageCrawler <- function(){
   token <- winDialogString("When browser opens, please click 'Get Access Token' twice and copy/paste token below", "")
   
   if (length(token) == 0) {
-    stop('No token entered \n\n') 
+    stop('Crawler stopped \n\n') 
   }
   
   # STEP 2: Get facebook ID. This can be a fanpage or whatever e.g. https://www.facebook.com/adidasSG
   tID <- winDialogString("Please enter FB page link below:", "https://www.facebook.com/adidasSG")
   
   if (length(tID) == 0) {
-    winDialog(type = "ok", "Crawler stopped.")
-    return()
+    stop('Crawler stopped \n\n') 
   }
   
   ID <- gsub(".*com/", "", tID)
@@ -33,20 +32,17 @@ FBPageCrawler <- function(){
   # STEP 3: How far back do you want get data for? Format should be YYYY-MM-DD
   since <- winDialogString("Please enter a START (older) date for how roughly far back to gather data from using this format: yyyy-mm-dd", "2015-01-01")  
   if (length(since) == 0) {
-    winDialog(type = "ok", "Crawler stopped.")
-    return()
+    stop('Crawler stopped \n\n') 
   }
     
   until <- winDialogString("Please enter a END (nearer) date using this format: yyyy-mm-dd", "2015-03-01")
   if (length(until) == 0) {
-    winDialog(type = "ok", "Crawler stopped.")
-    return()
+    stop('Crawler stopped \n\n') 
   }
   
   max.post <-as.numeric(winDialogString("Enter maximum posts to crawl within the period", "100"))
   if (length(max.post) == 0) {
-    winDialog(type = "ok", "Crawler stopped.")
-    return()
+    stop('Crawler stopped \n\n') 
   }
   
   #Extract information about a public Facebook post
@@ -83,5 +79,6 @@ FBPageCrawler <- function(){
     winDialog(type = "ok", paste("Post comments saved in\n\n ", getwd(), "/", fileName))  
   }
   
+  return(list(page, post.df))
   winDialog(type = "ok", "Facebook crawl job completed.")    
 }
