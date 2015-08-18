@@ -17,8 +17,7 @@ FBPageCrawler <- function(){
   token <- winDialogString("When browser opens, please click 'Get Access Token' twice and copy/paste token below", "")
   
   if (length(token) == 0) {
-    winDialog(type = "ok", "Crawler stopped.")
-    return()
+    stop('No token entered \n\n') 
   }
   
   # STEP 2: Get facebook ID. This can be a fanpage or whatever e.g. https://www.facebook.com/adidasSG
