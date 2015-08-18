@@ -9,5 +9,5 @@ Depends:
     httr,
     rjson,
     httpuv, 
-    RFacebook
+    Rfacebook
 License: GPL-2
