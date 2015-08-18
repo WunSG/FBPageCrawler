@@ -1,17 +1,17 @@
 
-for (package in c('devtools', 'httr', 'rjson', 'httpuv')) {
-  if (!require(package, character.only=T)) {
-    install.packages(package)
-    library(package, character.only=T)
-  }
-}
-
-if(!require("Rfacebook")){
-  install_github("WUNSG/Rfacebook/Rfacebook")
-  require(Rfacebook)
-}
-
 FBPageCrawler <- function(){
+  for (package in c('devtools', 'httr', 'rjson', 'httpuv')) {
+    if (!require(package, character.only=T)) {
+      install.packages(package)
+      library(package, character.only=T)
+    }
+  }
+  
+  if(!require("Rfacebook")){
+    install_github("WUNSG/Rfacebook/Rfacebook")
+    require(Rfacebook)
+  }
+  
   # STEP 1: Get fackebook token to access data. I need a crossplatform version of winDialog and winDialogString otherwise this only works on Windows
   winDialog(type = "ok", "Make sure you have already signed into Facebook.\n\nWhen  browser opens, please click 'Get Access Token' twice. You DO NOT need to select/check any boxes for a public feed.\n\n After pressing OK, swich over to your now open browser.")
   browseURL("http://developers.facebook.com/tools/explorer/?method=GET&path=100002667499585")
