@@ -1,0 +1,13 @@
+Package: FBPageCrawler
+Title: Calls RFacebook
+Description: Standard scripts to crawl a public Facebook Page and its comments.
+Version: 0.1
+Date: 2015/08/18
+Author: -
+Depends:
+    R (>= 2.12.0),
+    httr,
+    rjson,
+    httpuv, 
+    RFacebook
+License: GPL-2
