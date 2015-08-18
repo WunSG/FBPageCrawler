@@ -1,4 +1,4 @@
-for (package in c('devtools', 'httr', 'rjson', 'httpuv')) {
+for (package in c('devtools', 'httr', 'rjson', 'httpuv', 'stringr')) { 
   if (!require(package, character.only=T)) {
     install.packages(package)
     library(package, character.only=T)
@@ -17,42 +17,59 @@ FBPageCrawler <- function(){
   token <- winDialogString("When browser opens, please click 'Get Access Token' twice and copy/paste token below", "")
   
   if (length(token) == 0) {
-    stop('Crawler stopped \n\n') 
+    winDialog(type = "ok", "Crawler stopped.")
+    stop('Crawler stopped. \n\n')
   }
   
   # STEP 2: Get facebook ID. This can be a fanpage or whatever e.g. https://www.facebook.com/adidasSG
   tID <- winDialogString("Please enter FB page link below:", "https://www.facebook.com/adidasSG")
   
   if (length(tID) == 0) {
-    stop('Crawler stopped \n\n') 
+    winDialog(type = "ok", "Crawler stopped.")
+    stop('Crawler stopped. \n\n')
   }
   
   ID <- gsub(".*com/", "", tID)
   
   # STEP 3: How far back do you want get data for? Format should be YYYY-MM-DD
-  since <- winDialogString("Please enter a START (older) date for how roughly far back to gather data from using this format: yyyy-mm-dd", "2015-01-01")  
-  if (length(since) == 0) {
-    stop('Crawler stopped \n\n') 
-  }
+  repeat{
+    since <- winDialogString("Please enter a START (older) date for how roughly far back to gather data from using this format: yyyy-mm-dd", "2015-01-01")  
+    if (length(since) == 0) {
+      winDialog(type = "ok", "Crawler stopped.")
+      stop('Crawler stopped. \n\n')
+    }
+  
+    until <- winDialogString("Please enter a END (nearer) date using this format: yyyy-mm-dd", "2015-03-01")
+    if (length(until) == 0) {
+      winDialog(type = "ok", "Crawler stopped.")
+      stop('Crawler stopped. \n\n')
+    }
     
-  until <- winDialogString("Please enter a END (nearer) date using this format: yyyy-mm-dd", "2015-03-01")
-  if (length(until) == 0) {
-    stop('Crawler stopped \n\n') 
+    if (until <= since){      
+      winDialog(type = "ok", "START date later or equals to END date, please edit the dates. ")
+    } 
+    else {
+      break
+    }
   }
   
   max.post <-as.numeric(winDialogString("Enter maximum posts to crawl within the period", "100"))
   if (length(max.post) == 0) {
-    stop('Crawler stopped \n\n') 
+    winDialog(type = "ok", "Crawler stopped.")
+    stop('Crawler stopped. \n\n')
   }
   
   #Extract information about a public Facebook post
   page <- getPage(page=ID, token=token, n=max.post, 
                   since=since, until=until)
   
+  if (!exists("page")) {
+    winDialog(type = "ok", "Crawler stopped.")
+    stop('Error in access token, Crawler stopped. \n\n')
+  }
+  
   page[, 4] <- as.POSIXct(page[, 4], format = "%Y-%m-%dT%H:%M:%S+0000", tz = "GMT")
   attr(page[, 4], "tzone") <- "Singapore"
-  
-  library(stringr)
   
   fileName <- str_c(c(ID, "-page-", since, "to", until, ".csv"), collapse = "")
   write.csv(page, fileName)
@@ -69,9 +86,14 @@ FBPageCrawler <- function(){
       }
     }
     
+    if (!exists("post.df")) {
+      winDialog(type = "ok", "Error in access token, Crawler stopped.")
+      stop('Error in access token, Crawler stopped. \n\n')
+    }
+        
     #convert post timings to Singapore time (GMT+8)
-    page[, 4] <- as.POSIXct(page[, 4], format = "%Y-%m-%dT%H:%M:%S+0000", tz = "GMT")
-    attr(page[, 4], "tzone") <- "Singapore"
+    post.df[, 4] <- as.POSIXct(post.df[, 4], format = "%Y-%m-%dT%H:%M:%S+0000", tz = "GMT")
+    attr(post.df[, 4], "tzone") <- "Singapore"
     
     fileName <- str_c(c(ID, "-comments-", since, "to", until, ".csv"), collapse = "")
     write.csv(post.df, fileName)  
@@ -79,6 +101,5 @@ FBPageCrawler <- function(){
     winDialog(type = "ok", paste("Post comments saved in\n\n ", getwd(), "/", fileName))  
   }
   
-  return(list(page, post.df))
   winDialog(type = "ok", "Facebook crawl job completed.")    
 }
