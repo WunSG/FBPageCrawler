@@ -98,7 +98,7 @@ FBPageCrawler <- function(){
     fileName <- str_c(c(ID, "-comments-", since, "to", until, ".csv"), collapse = "")
     write.csv(post.df, fileName)  
     
-    winDialog(type = "ok", paste("Post comments saved in\n\n ", getwd(), "/", fileName))  
+    winDialog(type = "ok", paste(nrow(post.df), "page comments saved in\n\n ", getwd(), "/", fileName))
   }
   
   winDialog(type = "ok", "Facebook crawl job completed.")    
