@@ -71,6 +71,26 @@ FBPageCrawler <- function(){
   page[, 4] <- as.POSIXct(page[, 4], format = "%Y-%m-%dT%H:%M:%S+0000", tz = "GMT")
   attr(page[, 4], "tzone") <- "Singapore"
   
+  #Extract impression and reach information for all posts
+  if (winDialog(type = "yesno", "Crawl impression and reach statistics?") == "YES"){
+    for (i in 1:length(page$id)){
+      print(paste("Crawling impression and reach statistics from post", i, "of", length(page$id), "posts..."))    
+      
+      #impressions
+      insights <- getInsights(object_id=page[i, "id"], token=token, metric='post_impressions_by_paid_non_paid', period='lifetime')
+      page[i, "total_impressions"] <- insights[insights$variable == "total", "value"]
+      page[i, "unpaid_impressions"] <- insights[insights$variable == "unpaid", "value"]
+      page[i, "paid_impressions"] <- insights[insights$variable == "paid", "value"]
+      
+      #reach
+      insights <- getInsights(object_id=page[i, "id"], token=token, metric='post_impressions_by_paid_non_paid_unique', period='lifetime')
+      page[i, "total_reach"] <- insights[insights$variable == "total", "value"]
+      page[i, "unpaid_reach"] <- insights[insights$variable == "unpaid", "value"]
+      page[i, "paid_reach"] <- insights[insights$variable == "paid", "value"]
+    }
+  }
+    
+  
   fileName <- str_c(c(ID, "-page-", since, "to", until, ".csv"), collapse = "")
   write.csv(page, fileName)
   winDialog(type = "ok", paste(nrow(page), "page posts saved in\n\n ", getwd(), "/", fileName))
@@ -102,4 +122,6 @@ FBPageCrawler <- function(){
   }
   
   winDialog(type = "ok", "Facebook crawl job completed.")    
+  return(list(page, post.df))
 }
+
